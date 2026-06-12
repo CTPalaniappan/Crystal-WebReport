@@ -118,7 +118,7 @@
         <input type="text" id="ticker" placeholder="e.g. TSLA" maxlength="10" autocomplete="off">
     </div>
     
-    <button id="executeBtn" onclick="fireMasterDeployer()">INITIALIZE 6-ENGINE ANALYSIS</button>
+    <button id="executeBtn" type="button" onclick="fireMasterDeployer(event)">INITIALIZE 6-ENGINE ANALYSIS</button>
 
     <div class="status-box">
         <div class="status-line">
@@ -133,16 +133,15 @@
 </div>
 
 <script>
-    // B. Require a passcode the first time a user loads the URL
+    // Security Passcode Gate
     window.addEventListener('DOMContentLoaded', () => {
-        const correctPasscode = '1947'; // <-- Change this string to your chosen password
+        const correctPasscode = 'YOUR_PASSCODE'; // <-- Change this to your password
         
         if (sessionStorage.getItem('terminal_auth') !== 'true') {
             let authenticated = false;
             while (!authenticated) {
                 const userAttempt = prompt('ACCESS RESTRICTED: Enter Master Security Passcode:');
                 if (userAttempt === null) {
-                    // User pressed cancel, lock screen or blank it out
                     document.body.innerHTML = '<h1 style="color: #f85149; margin-top: 40px; text-align: center;">ACCESS DENIED: SESSION TERMINATED.</h1>';
                     return;
                 }
@@ -150,24 +149,40 @@
                     sessionStorage.setItem('terminal_auth', 'true');
                     authenticated = true;
                 } else {
-                    alert('INVALID CRENDENTIALS. TRY AGAIN.');
+                    alert('INVALID CREDENTIALS. TRY AGAIN.');
                 }
             }
         }
     });
 
-    function fireMasterDeployer() {
+    // Hard execution lock state variable
+    let isPipelineExecuting = false;
+
+    function fireMasterDeployer(e) {
+        // Stop browser default click/submit side effects entirely
+        if (e && typeof e.preventDefault === 'function') {
+            e.preventDefault();
+        }
+
+        // If a run is in progress, brick-wall any accidental secondary clicks
+        if (isPipelineExecuting) {
+            return false;
+        }
+
         const tickerInput = document.getElementById('ticker');
         const ticker = tickerInput.value.trim().toUpperCase();
         const btn = document.getElementById('executeBtn');
         const sysState = document.getElementById('sysState');
         const sysPipelines = document.getElementById('sysPipelines');
 
-        // A. Strict run validation: execution halted immediately if blank
-        if(!ticker) {
+        // Validation gate
+        if(!ticker || ticker.length === 0) {
             alert('CRITICAL: Target ticker field cannot be empty.');
-            return;
+            return false;
         }
+
+        // Turn on lock instantly
+        isPipelineExecuting = true;
 
         // 1. Instantly transition UI elements to show dispatch state
         btn.disabled = true;
@@ -184,7 +199,9 @@
             sysState.innerText = 'READY';
             sysState.style.color = '#58a6ff';
             sysPipelines.innerText = '0/6 Deployed';
-        }, 1500);
+            // Open lock back up for next clean search
+            isPipelineExecuting = false;
+        }, 3000); // 3 seconds layout protection block
 
         // 3. Dispatch payload using cross-origin bypass options to prevent browser wait locks
         fetch(`${webhookUrl}?ticker=${encodeURIComponent(ticker)}`, {
