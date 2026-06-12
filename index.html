@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crystal-III Master Terminal</title>
+    <style>
+        body {
+            background-color: #06090f;
+            color: #c9d1d9;
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .terminal-container {
+            background-color: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 8px;
+            padding: 30px;
+            width: 100%;
+            max-width: 600px;
+            box-shadow: 0 12px 32px rgba(0,0,0,0.7);
+        }
+        h1 {
+            color: #58a6ff;
+            font-size: 22px;
+            margin-top: 0;
+            border-bottom: 2px solid #21262d;
+            padding-bottom: 12px;
+            letter-spacing: 1px;
+        }
+        .input-group {
+            margin-top: 25px;
+            margin-bottom: 25px;
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+            color: #8b949e;
+            font-size: 14px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        input {
+            width: 100%;
+            background-color: #06090f;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            color: #7ee787; /* Terminal green for typed ticker */
+            padding: 14px;
+            font-size: 18px;
+            font-family: inherit;
+            box-sizing: border-box;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-align: center;
+        }
+        input:focus {
+            outline: none;
+            border-color: #58a6ff;
+            box-shadow: 0 0 0 2px rgba(88,166,255,0.15);
+        }
+        button {
+            background-color: #238636;
+            color: #ffffff;
+            border: 1px solid rgba(240,246,2fc,0.1);
+            border-radius: 6px;
+            padding: 15px 20px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            letter-spacing: 1px;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background-color: #2ea44f;
+        }
+        button:disabled {
+            background-color: #21262d;
+            color: #8b949e;
+            cursor: not-allowed;
+        }
+        .status-box {
+            margin-top: 25px;
+            background-color: #010409;
+            border: 1px solid #21262d;
+            border-radius: 6px;
+            padding: 15px;
+            font-size: 13px;
+            color: #8b949e;
+            line-height: 1.6;
+        }
+        .status-line {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        .status-value {
+            color: #58a6ff;
+        }
+    </style>
+</head>
+<body>
+
+<div class="terminal-container">
+    <h1>CRYSTAL WEBRESEARCH GENERATOR</h1>
+    
+    <div class="input-group">
+        <label for="ticker">Target Equity Ticker</label>
+        <input type="text" id="ticker" placeholder="e.g. TSLA" maxlength="10" autocomplete="off">
+    </div>
+    
+    <button id="executeBtn" onclick="fireMasterDeployer()">INITIALIZE 6-ENGINE ANALYSIS</button>
+
+    <div class="status-box">
+        <div class="status-line">
+            <span>System State:</span>
+            <span id="sysState" class="status-value">READY</span>
+        </div>
+        <div class="status-line">
+            <span>Active Sub-Pipelines:</span>
+            <span id="sysPipelines" class="status-value">0/6 Deployed</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    function fireMasterDeployer() {
+        const tickerInput = document.getElementById('ticker');
+        const ticker = tickerInput.value.trim().toUpperCase();
+        const btn = document.getElementById('executeBtn');
+        const sysState = document.getElementById('sysState');
+        const sysPipelines = document.getElementById('sysPipelines');
+
+        if(!ticker) {
+            alert('CRITICAL: Target ticker field cannot be empty.');
+            return;
+        }
+
+        // 1. Instantly transition UI elements to show dispatch state
+        btn.disabled = true;
+        btn.innerText = 'BROADCASTING PAYLOAD...';
+        sysState.innerText = 'FIRING PARENT ROUTER V3...';
+        sysState.style.color = '#d29922';
+
+        const webhookUrl = 'https://hook.eu1.make.com/hwaafaf5euw8x729f1hvsnkpdudqgapq';
+
+        // 2. Schedule the automatic UI reset independently of the network request
+        setTimeout(() => {
+            btn.disabled = false;
+            btn.innerText = 'INITIALIZE 6-ENGINE ANALYSIS';
+            sysState.innerText = 'READY';
+            sysState.style.color = '#58a6ff';
+            sysPipelines.innerText = '0/6 Deployed';
+        }, 1500);
+
+        // 3. Dispatch payload using cross-origin bypass options to prevent browser wait locks
+        fetch(`${webhookUrl}?ticker=${encodeURIComponent(ticker)}`, {
+            method: 'GET',
+            mode: 'no-cors',
+            credentials: 'omit'
+        })
+        .then(() => {
+            tickerInput.value = ''; 
+        })
+        .catch(err => {
+            console.log('Background pipeline triggered.');
+            tickerInput.value = '';
+        });
+    }
+</script>
+
+</body>
+</html>
